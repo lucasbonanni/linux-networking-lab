@@ -1,7 +1,8 @@
-
+# Applied computing laboratory
 
 ## Run machines on parallel
-vagrant up --parallel
+
+```vagrant up --parallel```
 
 ## Install guest additions plugin
-vagrant plugin install vagrant-vbguest
+```vagrant plugin install vagrant-vbguest```
