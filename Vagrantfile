@@ -19,6 +19,7 @@ Vagrant.configure("2") do |config|
   config.vm.define "cafwbackend" do |cafwbackend|
     cafwbackend.vm.box = "debian/bullseye64"
     cafwbackend.vm.network "private_network", ip: "192.168.10.1", netmask:"255.255.255.224", virtualbox__intnet: "vagrant_net"
+    cafwbackend.vm.network "private_network", ip: "192.168.10.33", netmask:"255.255.255.224", virtualbox__intnet: "vagrant_net"
     cafwbackend.vbguest.auto_update = true
   end
   config.vm.define "cafwfrontend" do |cafwfrontend|
