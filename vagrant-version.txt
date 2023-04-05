@@ -1,0 +1,4 @@
+Installed Version: 2.3.4
+Latest Version: 2.3.4
+ 
+You're running an up-to-date version of Vagrant!
