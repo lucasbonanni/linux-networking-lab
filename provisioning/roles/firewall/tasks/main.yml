@@ -1,0 +1,23 @@
+---
+- name: Firewall | Enmascaramiento de la red DMZ
+  ansible.builtin.iptables:
+    table: nat
+    chain: POSTROUTING
+    source: 192.168.10.32/27
+    destination: 0.0.0.0/0
+    jump: MASQUERADE
+    comment: Enmascaramiento de la red DMZ
+    state: "present"
+  become: true
+
+# - name: Firewall | Enmascaramiento de la red DMZ
+#   ansible.builtin.iptables:
+#     table: filter
+#     chain: FORWARD
+#     in_interface: eth0
+#     out_interface: eth2
+#     ctstate: NEW, ESTABLISHED
+#     jump: ACCEPT
+#     comment: Redirecciona el trafico a la red.
+#     state: "present"
+#   become: true

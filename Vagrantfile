@@ -45,6 +45,7 @@ Vagrant.configure("2") do |config|
           vb.customize ['storageattach', :id,  '--storagectl', 'SATA Controller', '--port',  disks.index(disk) + 1, '--device', 0, '--type', 'hdd', '--medium', disk_path]
         end
       end
+
   end
   config.vm.define "caserver02" do |caserver02|
     caserver02.vm.box = "debian/bullseye64"
@@ -58,6 +59,13 @@ Vagrant.configure("2") do |config|
     #cait.vm.network "private_network", ip: "192.168.10.2"
     cait.vbguest.auto_update = true
   end
+  config.vm.provision "ansible_local" do |ansible|
+    ansible.playbook = "provisioning/playbook.yml"
+    ansible.version = "latest"
+    ansible.groups = {
+      "firewall" => ["cafwbackend", "cafwfrontend"],
+    }
 
+  end
 
 end

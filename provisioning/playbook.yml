@@ -1,0 +1,42 @@
+- hosts: all
+  tags: always
+  become: true
+  pre_tasks:
+    - name: pre-run | update package cache (arch)
+      tags: always
+      yum: update_cache=yes
+      changed_when: False
+      when: ansible_distribution == "CentOS"
+
+    - name: pre-run | update package cache (debian, etc)
+      tags: always
+      apt: update_cache=yes
+      changed_when: False
+      when: ansible_distribution == "Debian"
+  roles:
+    - base
+
+
+- hosts: firewall
+  tags: firewall
+  become: true
+  roles:
+    - firewall
+  # tasks:
+  #   - name: Forward port 80 to 8600
+  #     ansible.builtin.iptables:
+  #       table: nat
+  #       chain: POSTROUTING
+  #       source: 192.168.10.32/27
+  #       destination: 0.0.0.0/0
+  #       jump: MASQUERADE
+  #       comment: Redirect web traffic to port 8600
+  #       state: "present"
+  #     become: yes
+
+
+- hosts: caserver01
+  tags: caserver01
+  become: true
+  roles:
+    - dhcp

@@ -1,0 +1,30 @@
+# Configuración de dhcp server
+- name: DHCP SERVER | Install isc-dhcp-server
+  ansible.builtin.package:
+    name:
+      - isc-dhcp-server
+    state: latest
+  when: ansible_distribution == "Debian"
+
+- name: DHCP SERVER | Copy isc configfiles
+  tags: dhcp
+  copy:
+    src: dhcp/isc-dhcp-server
+    dest: '/etc/default/isc-dhcp-server'
+    mode: 0644
+    force: true
+
+- name: DHCP SERVER | Copy dhcp configfiles
+  tags: dhcp
+  copy:
+    src: dhcp/dhcpd.conf
+    dest: '/etc/dhcp/dhcpd.conf'
+    mode: 0644
+    force: true
+
+- name: DHCP SERVER | Reload isc-dhcp-server
+  ansible.builtin.systemd:
+    name: isc-dhcp-server
+    state: reloaded
+
+# See \"systemctl status isc-dhcp-server.service\" and \"journalctl -xe\" for details.\n"}
