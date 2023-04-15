@@ -40,3 +40,9 @@
   become: true
   roles:
     - dhcp
+
+- hosts: caserver02
+  tags: caserver02
+  become: true
+  roles:
+    - mysql

@@ -1,0 +1,71 @@
+---
+- name: MySQL | Install default-mysql-server
+  tags: mysql
+  ansible.builtin.package:
+    name: default-mysql-server
+    state: latest
+
+- name: MySQL | Install python3-pip
+  tags: mysql
+  ansible.builtin.package:
+    name: python3-pip
+    state: latest
+
+- name: MySQL | Install virtualenv
+  tags: mysql
+  ansible.builtin.package:
+    name: virtualenv
+    state: latest
+
+- name: MySQL | Install python3-setuptools
+  tags: mysql
+  ansible.builtin.package:
+    name: python3-setuptools
+    state: latest
+
+- name: MySQL | Install python3-pymysql
+  tags: mysql
+  ansible.builtin.package:
+    name: default-mysql-server
+    state: latest
+
+- name: Install pymysql python package
+  tags: mysql
+  ansible.builtin.pip:
+    name: pymysql
+
+- name: Enable service mysql
+  tags: mysql
+  ansible.builtin.service:
+    name: mysql
+    enabled: yes
+
+- name: MySQL | Start service htmysqltpd, in all cases
+  tags: mysql
+  ansible.builtin.service:
+    name: mysql
+    state: started
+
+- name: MySQL | Create database user bobaplicadauser
+  tags: mysql
+  community.mysql.mysql_user:
+    name: bobaplicadauser
+    password: 'palermo'
+    priv: '*.*:ALL'
+    state: present
+    login_unix_socket: /run/mysqld/mysqld.sock
+
+- name: MySQL | Create database user palermo
+  tags: mysql
+  community.mysql.mysql_user:
+    name: palermo
+    password: 'palermo'
+    priv: '*.*:ALL'
+    state: present
+    login_unix_socket: /run/mysqld/mysqld.sock
+
+- name: MySQL | Reload service mysql
+  tags: mysql
+  ansible.builtin.service:
+    name: mariadb.service
+    state: restarted
