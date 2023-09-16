@@ -21,13 +21,21 @@ Vagrant.configure("2") do |config|
     cafwbackend.vm.network "private_network", ip: "192.168.10.1", netmask:"255.255.255.224", virtualbox__intnet: "vagrant_net"
     cafwbackend.vm.network "private_network", ip: "192.168.10.33", netmask:"255.255.255.224", virtualbox__intnet: "vagrant_net"
     cafwbackend.vbguest.auto_update = true
+    cafwbackend.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "250"]
+    end
   end
   config.vm.define "cafwfrontend" do |cafwfrontend|
     cafwfrontend.vm.box = "debian/bullseye64"
     # No tiene nick lan / tiene NIC DMZ
-    cafwfrontend.vm.network "private_network", type: "dhcp"
+    # cafwfrontend.vm.network "private_network", type: "dhcp"
+    config.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
+    # cafwfrontend.vm.network "private_network", ip: "192.168.10.7", netmask:"255.255.255.224", virtualbox__intnet: "vagrant_net"
     cafwfrontend.vm.network "private_network", ip: "192.168.10.34", netmask:"255.255.255.224", virtualbox__intnet: "vagrant_net"
     cafwfrontend.vbguest.auto_update = true
+    cafwfrontend.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", "250"]
+    end
   end
   config.vm.define "caserver01" do |caserver01|
     caserver01.vm.box = "debian/bullseye64"
