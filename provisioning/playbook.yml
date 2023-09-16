@@ -46,3 +46,4 @@
   become: true
   roles:
     - mysql
+    - apache
