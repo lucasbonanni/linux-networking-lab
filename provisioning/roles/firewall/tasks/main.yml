@@ -1,10 +1,55 @@
 ---
+- name: Iptables flush filter
+  ansible.builtin.iptables:
+    chain: "{{ item }}"
+    flush: true
+  with_items:  [ 'INPUT', 'FORWARD', 'OUTPUT' ]
+
+- name: Iptables flush nat
+  ansible.builtin.iptables:
+    table: nat
+    chain: '{{ item }}'
+    flush: true
+  with_items: [ 'INPUT', 'OUTPUT', 'PREROUTING', 'POSTROUTING' ]
+
+- name: Allow new incoming SYN packets on TCP port 22 (SSH)
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: 22
+    ctstate: NEW
+    syn: match
+    jump: ACCEPT
+    comment: Accept new SSH connections.
+
+- name: Allow related and established connections
+  ansible.builtin.iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+  become: true
+
+- name: Allow loopback connections
+  ansible.builtin.iptables:
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT
+  become: true
+
+- name: Allow access to the firewall from LAN
+  ansible.builtin.iptables:
+    chain: INPUT
+    source: 192.168.10.0/27
+    in_interface: eht2
+    jump: ACCEPT
+  become: true
+
 - name: Firewall | Enmascaramiento de la red DMZ
   ansible.builtin.iptables:
     table: nat
     chain: POSTROUTING
-    source: 192.168.10.32/27
-    destination: 0.0.0.0/0
+    source: 192.168.10.0/27
+    out_interface: eht0
     jump: MASQUERADE
     comment: Enmascaramiento de la red DMZ
     state: "present"
