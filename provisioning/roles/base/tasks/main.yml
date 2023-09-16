@@ -5,8 +5,11 @@
       - htop
       - bat
       - exa
-      - finger
+      - finger 
       - psmisc
+      - net-tools # to have netstat
+      - ccze # to colorize logs
+      - curl
     state: latest
   when: ansible_distribution == "Debian"
 
