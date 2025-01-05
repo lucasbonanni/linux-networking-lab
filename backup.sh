@@ -4,6 +4,9 @@ current_date=$(date -u +"%Y-%m-%d_%H-%M-%S"z)
 
 log_dir="/var/logs/backup.sh.logs"
 logfile="$log_dir/backup-data1.sh_${current_date}.log"
+exclusiones=""
+origen="/media/data1"
+destino="/media/backups"
 
 # Set up log directory and file
 if [[ ! -d "$log_dir" ]]; then
@@ -24,9 +27,8 @@ function handle_error() {
 trap 'handle_error $LINENO' ERR
 
 # Define rsync command
-rsync_command="rsync -vhaz --delete"
-source_dir="/media/data1"
-destination_dir="/media/backups"
+rsync_command="rsync -vhraz --delete --exclude-from=$exclusiones --log-file=$log_file $origen $destino"
+
 
 # Execute rsync command
-${rsync_command} "${source_dir}" "${destination_dir}"
+${rsync_command} &>> $logfile
