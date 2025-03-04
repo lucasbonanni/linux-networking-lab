@@ -1,34 +1,22 @@
 #!/bin/bash
 
-current_date=$(date -u +"%Y-%m-%d_%H-%M-%S"z)
-
-log_dir="/var/logs/backup.sh.logs"
-logfile="$log_dir/backup-data1.sh_${current_date}.log"
-exclusiones=""
-origen="/media/data1"
-destino="/media/backups"
-
-# Set up log directory and file
-if [[ ! -d "$log_dir" ]]; then
-    mkdir -p "$log_dir"
-fi
-
-# Redirect standard error to logfile
-exec 2>> "$logfile"
-
-# Error handling function
-function handle_error() {
-    local exit_code=$?
-    echo "An error occurred in line $1. Exiting script." >&2
-    exit $exit_code
+function now() {
+    date -u +"%Y-%m-%d_%H-%M-%S"z
 }
 
-# Set error handling
-trap 'handle_error $LINENO' ERR
+base_dir=$(dirname "$0")
+base_name=$(basename -- "$0")
+log_dir=$base_dir/$base_name'.logs'
+logfile=$log_dir/$base_name'_'`now`.log
 
-# Define rsync command
-rsync_command="rsync -vhraz --delete --exclude-from=$exclusiones --log-file=$log_file $origen $destino"
+if [ ! -d $log_dir ]; then
+    mkdir $log_dirv
+fi
 
+argumentos="-vhaz --delete"
 
-# Execute rsync command
-${rsync_command} &>> $logfile
+if [ "$#" -gt 0 ] && [ -f $1 ]; then
+    argumentos="${argumentos} --exclude-from="${1}
+fi
+
+rsync $argumentos /media/data1 /media/backups &>> $logfile

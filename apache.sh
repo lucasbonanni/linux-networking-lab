@@ -1,0 +1,1 @@
+curl https://github.com/sanchezih/up-computacionaplicada/raw/master/trabajo-practico/caserver02-assets/war-apps/agendasimpleca.war -o agendasimpleca.war

@@ -1,0 +1,137 @@
+---
+# Falta el paso de descomprimir los archivos de la iso.
+# Habría que probar con este módulo. https://docs.ansible.com/ansible/latest/collections/community/general/iso_extract_module.html
+
+# Los pasos generales.
+# https://www.linuxtopic.com/2018/06/PXE-Boot-server-configuration-ubuntu.html
+- name: DHCP SERVER | Remove pxelinux syslinux dnsmasq
+  ansible.builtin.apt:
+    pkg:
+      - pxelinux
+      - syslinux
+      - dnsmasq
+    state: absent
+    purge: true
+  when: ansible_distribution == "Debian"
+
+- name: DHCP SERVER | remove nfs-server apache2
+  ansible.builtin.apt:
+    pkg:
+      - nfs-server
+      - apache2
+    state: absent
+    purge: true
+  when: ansible_distribution == "Debian"
+
+
+# Configuración de dhcp server
+- name: DHCP SERVER | Install syslinux dnsmasq
+  ansible.builtin.package:
+    name:
+      - syslinux
+      - dnsmasq
+    state: present
+  when: ansible_distribution == "Debian"
+
+- name: DHCP SERVER | Install pxelinux
+  ansible.builtin.package:
+    name: pxelinux
+    state: present
+  when: ansible_distribution == "Debian"
+
+
+- name: DHCP SERVER | Copy dhcp configfiles
+  tags: dhcp
+  copy:
+    src: dnsmasq/dnsmasq.conf
+    dest: '/etc/dnsmasq.conf'
+    mode: 0644
+
+- name: TFTPBOOT | Create the directories tftpboot & pxelinux.cfg
+  ansible.builtin.file:
+    mode: 755
+    path: "{{item}}"
+    state: directory
+  with_items:
+    - /var/lib/tftpboot
+    - /var/lib/tftpboot/pxelinux.cfg
+    - /etc/dnsmasq/
+    - /etc/apache2/sites-enabled/
+
+- name: TFTPBOOT | Create the centos directories 
+  ansible.builtin.file:
+    mode: 755
+    path: "{{item}}"
+    state: directory
+  with_items:
+    - /var/lib/tftpboot/data
+    - /var/lib/tftpboot/data/centos7_64bit
+    
+
+- name: TFTPBOOT | Copy necesary files.
+  ansible.builtin.copy:
+    dest:  /var/lib/tftpboot
+    mode: 755
+    src: "{{item}}"
+    remote_src: yes
+  with_items:
+    - /usr/lib/PXELINUX/pxelinux.0
+    - /usr/lib/syslinux/modules/bios/menu.c32
+    - /usr/lib/syslinux/modules/bios/ldlinux.c32
+    - /usr/lib/syslinux/modules/bios/libmenu.c32
+    - /usr/lib/syslinux/modules/bios/libutil.c32
+    - /usr/lib/syslinux/modules/bios/libcom32.c32 
+    - /usr/lib/syslinux/modules/bios/vesamenu.c32
+
+- name: DHCP SERVER | Copy pxelinux config
+  tags: dhcp
+  copy:
+    src: PXE/default
+    dest: '/var/lib/tftpboot/pxelinux.cfg'
+    mode: 755
+    force: true
+
+
+
+
+- name: Ensure directories are 0755
+  command: chmod -R 755 /var/lib/tftpboot/data
+
+- name: Ensure directories are 0755
+  command: chmod a+rw -R /var/lib/tftpboot/
+
+- name: Start service dnsmasq, if not started
+  ansible.builtin.service:
+    name: dnsmasq
+    state: started
+    enabled: true
+
+- name: DHCP SERVER | Install nfs-server
+  ansible.builtin.package:
+    name:
+      - nfs-server
+      - apache2
+    state: present
+  when: ansible_distribution == "Debian"
+
+- name: DHCP SERVER | Copy dhcp configfiles
+  tags: dhcp
+  copy:
+    src: nfs-server/exports
+    dest: '/etc/exports'
+    mode: 0644
+
+- name: Start service nfs-server, if not started
+  ansible.builtin.service:
+    name: nfs-server
+    state: started
+    enabled: true
+
+- name: DHCP SERVER | Copy apache file
+  tags: dhcp
+  copy:
+    src: apache2/pxeboot.conf
+    dest: '/etc/apache2/sites-enabled/pxeboot.conf'
+    mode: 755
+
+# See \"systemctl status isc-dhcp-server.service\" and \"journalctl -xe\" for details.\n"}

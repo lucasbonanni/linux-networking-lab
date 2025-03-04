@@ -1,0 +1,112 @@
+---
+
+# # Note: equivalent to sudo useradd -m -d /opt/tomcat -U -s /bin/false tomcat
+# - name: "Apache | Add tomcat user home: /opt/tomcat shell: /bin/false"
+#   ansible.builtin.user:
+#     name: tomcat
+#     home: /opt/tomcat
+#     shell: /bin/false
+#     estate: present 
+
+# - name: Apache | Install 
+#   tags: apache
+#   ansible.builtin.package:
+#     name: default-jdk
+#     state: latest
+
+# - name: Apache | Install apache2
+#   tags: apache
+#   ansible.builtin.package:
+#     name: apache2
+#     state: latest
+
+# - name: Apache | started apache service
+#   service:
+#     name: apache2
+#     state: started
+
+# - name: Apache | enable apache service
+#   service:
+#     name: apache2
+#     state: enabled
+
+# - name: Apache | Grant tomcat ownership over the extracted installation
+#   ansible.builtin.file:
+#     path: /opt/tomcat/
+#     owner: tomcat
+#     group: tomcat
+
+# - name: Apache | Grant tomcat ownership over the extracted installation
+#   ansible.builtin.file:
+#     path: /opt/tomcat/
+#     owner: tomcat
+#     group: tomcat
+
+# - name: Apache | restart apache2 service
+#   service:
+#     name: apache2
+#     state: restarted
+
+- name: "Apache | Add tomcat user home: /opt/tomcat shell: /bin/false"
+  ansible.builtin.user:
+    name: tomcat
+    home: /opt/tomcat
+    shell: /bin/false
+
+- name: Install prerequisites
+  apt: name={{ item }} update_cache=yes state=latest force_apt_get=yes
+  loop: [ 'aptitude' ]
+
+- name: Install Apache
+  apt: name=apache2 update_cache=yes state=latest
+
+# - name: Create document root
+#   file:
+#     path: "/var/www/{{ http_host }}"
+#     state: directory
+#     owner: "{{ app_user }}"
+#     mode: '0755'
+
+- name: Create simpleca folder # <-----
+  file:
+    path: "/var/www/simpleca"
+    state: directory
+    owner: "{{ app_user }}"
+    mode: '0755'
+
+# - name: Copy index test page
+#   template:
+#     src: "templates/index.html.j2"
+#     dest: "/var/www/{{ http_host }}/index.html"
+
+- name: Copy simpleca app  # <-----
+  template:
+    src: "templates/index.html.j2"
+    dest: "/var/www/simpleca/agendasimpleca.war"
+
+# - name: Set up Apache virtuahHost
+#   template:
+#     src: "templates/apache.conf.j2"
+#     dest: "/etc/apache2/sites-available/{{ http_conf }}"
+
+- name: Set up Apache virtuahHost simpleca # <-------
+  template:
+    src: "templates/simpleca.conf.j2"
+    dest: "/etc/apache2/sites-available/simpleca.conf"
+
+- name: Enable new site
+  shell: /usr/sbin/a2ensite simpleca.conf
+  notify: Reload Apache
+
+- name: Disable default Apache site
+  shell: /usr/sbin/a2dissite 000-default.conf
+  when: disable_default
+  notify: Reload Apache
+
+
+
+# - name: "UFW - Allow HTTP on port {{ http_port }}"
+#   ufw:
+#     rule: allow
+#     port: "{{ http_port }}"
+#     proto: tcp

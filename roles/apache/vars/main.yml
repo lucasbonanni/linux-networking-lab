@@ -1,0 +1,6 @@
+---
+app_user: "tomcat"
+http_host: "awesome"
+http_conf: "awesome.conf"
+http_port: "80"
+disable_default: true

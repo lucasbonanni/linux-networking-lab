@@ -1,0 +1,14 @@
+default vesamenu.c32
+prompt 0
+timeout 50
+
+LABEL 1
+MENU LABEL ^1) Bootear desde el disco rigido local
+MENU AUTOBOOT
+MENU DEFAULT
+LOCALBOOT 0
+
+LABEL 2
+MENU LABEL ^2) Instalar CentOS 7 x86_64 Minimal 2009 - NFS
+kernel data/centos7_64bit/images/pxeboot/vmlinuz
+append initrd=data/centos7_64bit/images/pxeboot/initrd.img inst.stage2=nfs:192.168.10.2:/var/lib/tftpboot/data/centos7_64bit quiet

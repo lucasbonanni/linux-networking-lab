@@ -1,0 +1,30 @@
+# - hosts: all
+#   tags: always
+#   become: true
+#   pre_tasks:
+#     - name: pre-run | update package cache (CentOS)
+#       tags: always
+#       yum: update_cache=yes
+#       changed_when: False
+#       when: ansible_distribution == "CentOS"
+
+#     - name: pre-run | update package cache (debian, etc)
+#       tags: always
+#       apt: update_cache=yes
+#       changed_when: False
+#       when: ansible_distribution == "Debian"
+#   roles:
+#     - base
+
+- hosts: caserver02
+  tags: caserver02
+  become: true
+  roles:
+    - mysql
+    - apache
+
+- hosts: caserver01
+  tags: caserver01
+  become: true
+  roles:
+    - pxe

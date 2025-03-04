@@ -1,0 +1,12 @@
+<VirtualHost *:{{ http_port }}>
+   ServerAdmin caadmin@localhost
+   ServerName {{ http_host }}
+   ServerAlias www.{{ http_host }}
+   DocumentRoot /var/www/simpleca
+   ErrorLog ${APACHE_LOG_DIR}/error.log
+   CustomLog ${APACHE_LOG_DIR}/access.log combined
+   SetEnv CA_MYSQL_SERVER_IP=127.0.0.1
+   SetEnv CA_MYSQL_SERVER_USERNAME=bobaplicadauser
+   SetEnv CA_MYSQL_SERVER_PASSWORD=palermo
+   SetEnv CA_MYSQL_SERVER_PORT=3306
+</VirtualHost>

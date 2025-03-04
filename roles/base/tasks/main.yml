@@ -1,0 +1,85 @@
+- name: Apps | Install the latest version of vim and htop
+  ansible.builtin.package:
+    name:
+      - vim
+      - htop
+      - bat
+      - exa
+      - finger 
+      - psmisc
+      - net-tools # to have netstat
+      - ccze # to colorize logs
+      - curl
+      - nmap
+    state: latest
+  when: ansible_distribution == "Debian"
+
+
+# - name: BAT | Create a directory local/bin
+#   ansible.builtin.file:
+#     path: ~/.local/bin
+#     state: directory
+#     mode: '0755'
+#     force: true
+#   when: ansible_distribution == "Debian"
+
+# - name: BAT | Configure and link BAT
+#   tags: base
+#   shell: "ln -s /usr/bin/batcat ~/.local/bin/bat"
+#   when: ansible_distribution == "Debian"
+
+
+# - name: BAT | Create a symbolic link for BAT
+#   ansible.builtin.file:
+#     src: /usr/bin/batcat
+#     dest: ~/.local/bin/bat
+#     owner: vagrant
+#     state: link
+#     force: true
+#   when: ansible_distribution == "Debian"
+
+
+- name: system setup | clock | install systemd-timesyncd (debian)
+  tags: base
+  apt:
+    name: systemd-timesyncd
+    state: latest
+  when: ansible_distribution == "Debian"
+
+- name: system setup | clock | start and enable systemd-timesyncd
+  tags: base
+  service:
+    name: systemd-timesyncd
+    state: started
+    enabled: true
+
+- name: system setup | clock | set time zone
+  tags: base
+  timezone:
+    name: "America/Argentina/Buenos_Aires"
+
+
+- name: system setup | locale | add es_AR
+  tags: locale,system,setup
+  locale_gen:
+    name: es_AR.UTF-8
+    state: present
+
+- name: system setup | locale | set locale to es_AR
+  tags: locale,system,setup
+  locale_gen:
+    name: es_AR.UTF-8
+    state: present
+  register: locale
+
+- name: system setup | locale | set es_AR as default locale
+  tags: locale,system,setup
+  command: localectl set-locale LANG=es_AR.UTF-8
+  when: locale.changed
+
+- name: system setup | locale | remove en_GB
+  tags: locale,system,setup
+  locale_gen:
+    name: en_GB.UTF-8
+    state: absent
+  when: locale.changed
